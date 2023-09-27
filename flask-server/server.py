@@ -16,6 +16,24 @@ def home():
 	else:
 		#route the login
 
+@app.route('/register', methods = ['GET', 'POST'])
+def register():
+	if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        conn = create_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE username=?", (username,))
+        existing_user = cursor.fetchone()
+        if existing_user:
+            return "Username already exists. Please choose another one."
+        cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
+        conn.commit()
+        conn.close()
+        session['username'] = username
+        return redirect(url_for('home'))
+    return render_template('register.html')
+
 
 @app.route("/members")
 def members():
